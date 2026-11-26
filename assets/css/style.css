@@ -1579,3 +1579,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   body { background: #fff; color: #000; }
   .section { padding: 20px 0; }
 }
+
+/* ---------- Ссылка на админку в подвале ---------- */
+.footer__admin { color: var(--muted-2); text-decoration: underline; text-decoration-color: rgba(216,165,93,.4); text-underline-offset: 3px; transition: color .2s; }
+.footer__admin:hover { color: var(--gold-2); }

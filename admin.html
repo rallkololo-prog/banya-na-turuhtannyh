@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Админка — Баня на Турухтанных</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preload" href="assets/fonts/inter-400-cyr.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="admin-body">
+
+<header class="admin-bar">
+  <div class="admin-bar__inner">
+    <a class="admin-brand" href="index.html">
+      <span class="admin-brand__mark">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 26V13l8-6 8 6v13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13 26v-6h6v6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+      </span>
+      <span>
+        <strong>Админка</strong>
+        <small>Баня на Турухтанных</small>
+      </span>
+    </a>
+
+    <div class="admin-bar__actions">
+      <a class="btn btn--ghost btn--sm" href="index.html?preview=1" target="_blank" rel="noopener">Предпросмотр</a>
+      <a class="btn btn--ghost btn--sm" href="index.html" target="_blank" rel="noopener">Сайт</a>
+      <button class="btn btn--ghost btn--sm" type="button" id="download-btn">Скачать JSON</button>
+      <button class="btn btn--primary btn--sm" type="button" id="publish-btn">Опубликовать</button>
+    </div>
+  </div>
+</header>
+
+<div class="admin-status" id="status" hidden></div>
+
+<main class="admin-main">
+
+  <nav class="admin-tabs" id="tabs" role="tablist" aria-label="Разделы админки">
+    <button class="admin-tab is-active" type="button" data-tab="prices" role="tab" aria-selected="true">Цены</button>
+    <button class="admin-tab" type="button" data-tab="extras" role="tab" aria-selected="false">Допуслуги</button>
+    <button class="admin-tab" type="button" data-tab="menu" role="tab" aria-selected="false">Меню</button>
+    <button class="admin-tab" type="button" data-tab="gallery" role="tab" aria-selected="false">Фотографии</button>
+    <button class="admin-tab" type="button" data-tab="help" role="tab" aria-selected="false">Как это работает</button>
+  </nav>
+
+  <!-- ======================= ЦЕНЫ ======================= -->
+  <section class="admin-panel is-active" id="panel-prices" role="tabpanel">
+    <div class="admin-head">
+      <h1>Цены по дням недели</h1>
+      <p>Ставка — рублей за час. «В подарок» — акция: сколько часов оплатить и сколько дать бесплатно.
+         Если акции нет, поставьте 0 в обоих полях.</p>
+    </div>
+
+    <div class="admin-rows" id="price-rows"></div>
+
+    <div class="admin-card">
+      <h2>Праздничные и предпраздничные дни</h2>
+      <p class="admin-note">Тариф, который действует в праздники и предпраздничные дни. В эти дни акции и скидка в день рождения отключаются автоматически.</p>
+      <div class="admin-grid admin-grid--3">
+        <label class="admin-field"><span>Название строки в таблице</span><input type="text" data-bind="tariffs.holiday.label"></label>
+        <label class="admin-field"><span>Ставка, ₽/час</span><input type="number" min="0" step="50" data-bind="tariffs.holidayRate"></label>
+        <label class="admin-field"><span>Подпись под ценой</span><input type="text" data-bind="tariffs.holiday.note"></label>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h2>Общие правила</h2>
+      <p class="admin-note">От этих чисел зависит калькулятор: минимальный заказ, доплата за гостей, скидка в день рождения.</p>
+      <div class="admin-grid admin-grid--3">
+        <label class="admin-field"><span>Минимум часов</span><input type="number" min="1" step="1" data-bind="tariffs.minHours"></label>
+        <label class="admin-field"><span>Гостей включено в цену</span><input type="number" min="1" step="1" data-bind="guests.included"></label>
+        <label class="admin-field"><span>Офуро обязательно от, чел.</span><input type="number" min="1" step="1" data-bind="guests.ofuroFrom"></label>
+        <label class="admin-field"><span>Доплата с гостя, ₽/час (до)</span><input type="number" min="0" step="50" data-bind="guests.tier1.rate"></label>
+        <label class="admin-field"><span>…до какого количества, чел.</span><input type="number" min="1" step="1" data-bind="guests.tier1.upTo"></label>
+        <label class="admin-field"><span>Доплата сверх этого, ₽/час</span><input type="number" min="0" step="50" data-bind="guests.tier2.rate"></label>
+        <label class="admin-field"><span>Скидка в день рождения, %</span><input type="number" min="0" max="100" step="1" data-bind="discount.birthdayPercent"></label>
+        <label class="admin-field"><span>Дети бесплатно до, лет</span><input type="number" min="0" step="1" data-bind="guests.kidsFreeAge"></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= ДОПУСЛУГИ ======================= -->
+  <section class="admin-panel" id="panel-extras" role="tabpanel">
+    <div class="admin-head">
+      <h1>Дополнительные услуги</h1>
+      <p>Список сразу попадает в блок «Дополнительные услуги» и в калькулятор. Можно менять цену,
+         переименовать, удалить или добавить новую. «Переключатель» — галочка в калькуляторе,
+         «Количество» — счётчик со штуками.</p>
+      <button class="btn btn--primary btn--sm" type="button" id="add-extra">Добавить услугу</button>
+    </div>
+    <div class="admin-list" id="extras-list"></div>
+  </section>
+
+  <!-- ======================= МЕНЮ ======================= -->
+  <section class="admin-panel" id="panel-menu" role="tabpanel">
+    <div class="admin-head">
+      <h1>Пункты меню</h1>
+      <p>Это ссылки в шапке сайта и в мобильном меню. Ссылка начинается с «#» (например <code>#prices</code> —
+         блок цен на этой же странице) или это полный адрес сайта.</p>
+      <button class="btn btn--primary btn--sm" type="button" id="add-menu">Добавить пункт</button>
+    </div>
+    <div class="admin-list" id="menu-list"></div>
+    <div class="admin-card">
+      <h2>Куда ведут ссылки</h2>
+      <p class="admin-note">
+        <code>#about</code> — о комплексе, <code>#gallery</code> — фотографии, <code>#prices</code> — цены,
+        <code>#calc</code> — калькулятор, <code>#rules</code> — условия, <code>#contacts</code> — контакты.
+        Такой якорь можно поставить только на существующий блок.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======================= ФОТО ======================= -->
+  <section class="admin-panel" id="panel-gallery" role="tabpanel">
+    <div class="admin-head">
+      <h1>Фотографии</h1>
+      <p>Загрузите файл — админка сама сделает уменьшенную копию для галереи и полноразмерную для просмотра.
+         Подпись видна под фото, категория — это кнопка фильтра.</p>
+    </div>
+
+    <div class="admin-upload" id="upload-zone">
+      <input type="file" id="upload-input" accept="image/jpeg,image/png,image/webp" multiple hidden>
+      <div class="admin-upload__icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4 4 4M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <p><strong>Перетащите фотографии сюда</strong> или нажмите, чтобы выбрать файлы</p>
+      <p class="admin-note">JPG, PNG или WEBP. Лучше горизонтальные, шире 1200 px.</p>
+      <label class="admin-field admin-field--inline">
+        <span>Категория для новых фото</span>
+        <select id="upload-category"></select>
+      </label>
+    </div>
+
+    <div class="admin-card">
+      <h2>Категории</h2>
+      <p class="admin-note">Через запятую. Из них строятся кнопки фильтра над галереей.</p>
+      <label class="admin-field"><input type="text" id="categories-input"></label>
+    </div>
+
+    <div class="admin-gallery" id="gallery-list"></div>
+  </section>
+
+  <!-- ======================= ПОМОЩЬ ======================= -->
+  <section class="admin-panel" id="panel-help" role="tabpanel">
+    <div class="admin-head">
+      <h1>Как это работает</h1>
+      <p>Коротко: что здесь можно менять, что происходит при публикации и что делать, если что-то пошло не так.</p>
+    </div>
+
+    <div class="admin-card">
+      <h2>1. Что где лежит</h2>
+      <ul class="admin-help">
+        <li><b>Цены</b> — ставка за час по каждому дню недели, акции «часы в подарок», праздничный тариф, правила для гостей и скидки. Всё, что вы здесь поменяете, сразу пересчитывается в калькуляторе сайта.</li>
+        <li><b>Допуслуги</b> — офуро, печь, мангал, веники, полотенца, простыни, комплекты, уголь, стоянка. Каждая строка — карточка на сайте и поле в калькуляторе.</li>
+        <li><b>Меню</b> — пункты в шапке и в мобильном меню.</li>
+        <li><b>Фотографии</b> — галерея: загрузка, подписи, категории (кнопки фильтра) и удаление.</li>
+      </ul>
+    </div>
+
+    <div class="admin-card">
+      <h2>2. Как сохранить изменения</h2>
+      <p>Пока вы редактируете, всё хранится в этом браузере как черновик. Кнопка <b>«Предпросмотр»</b> вверху
+         открывает сайт с вашим черновиком — удобно проверить, ничего не публикуя.</p>
+      <p>Чтобы изменения увидели все посетители, нажмите <b>«Опубликовать»</b>. Админка запишет файл
+         <code>assets/data/content.json</code> (и новые фотографии) в репозиторий сайта на GitHub.
+         Через 30–60 секунд GitHub Pages обновит страницу — обновите её с очисткой кеша (Ctrl+F5).</p>
+    </div>
+
+    <div class="admin-card">
+      <h2>3. Ключ доступа (один раз)</h2>
+      <p>Для публикации нужен ключ GitHub. Он хранится только в вашем браузере и никуда не отправляется, кроме github.com.</p>
+      <ol class="admin-help">
+        <li>Откройте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+        <li>Название — любое, например «админка бани». Срок — можно «No expiration».</li>
+        <li><b>Repository access</b> → Only select repositories → <code>rallkololo-prog/banya-na-turuhtannyh</code>.</li>
+        <li><b>Permissions</b> → Repository permissions → <b>Contents: Read and write</b>. Больше ничего не нужно.</li>
+        <li>Нажмите «Generate token», скопируйте и вставьте в поле ключа в админке (появится при первой публикации).</li>
+      </ol>
+      <p class="admin-note">Ключ можно отозвать в любой момент на той же странице GitHub.</p>
+    </div>
+
+    <div class="admin-card">
+      <h2>4. Если что-то сломалось</h2>
+      <ul class="admin-help">
+        <li><b>«Не удалось опубликовать»</b> — чаще всего истёк ключ или у него нет права Contents: write. Создайте новый и вставьте заново.</li>
+        <li><b>На сайте старые цены</b> — подождите минуту и обновите страницу с Ctrl+F5, GitHub Pages собирает сайт не мгновенно.</li>
+        <li><b>Хочу вернуть как было</b> — кнопка «Скачать JSON» сохраняет текущее состояние, а прежние версии файла всегда лежат в истории репозитория на GitHub.</li>
+        <li><b>Ничего не трогайте в других файлах</b> (<code>index.html</code>, <code>style.css</code>) — для цен, меню и фото админки достаточно.</li>
+      </ul>
+      <button class="btn btn--ghost btn--sm" type="button" id="reset-btn">Сбросить черновик</button>
+    </div>
+  </section>
+</main>
+
+<!-- Модальное окно публикации -->
+<div class="admin-modal" id="modal" hidden>
+  <div class="admin-modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title">Публикация на сайт</h2>
+    <div id="modal-body">
+      <p class="admin-note">Нужен ключ GitHub с правом Contents: Read and write на репозиторий сайта.
+        Подробная инструкция — во вкладке «Как это работает».</p>
+      <label class="admin-field">
+        <span>Ключ GitHub (токен)</span>
+        <input type="password" id="token-input" placeholder="github_pat_…" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="admin-check">
+        <input type="checkbox" id="token-remember" checked>
+        <span>Запомнить в этом браузере</span>
+      </label>
+    </div>
+    <div class="admin-log" id="publish-log" hidden></div>
+    <div class="admin-modal__actions">
+      <button class="btn btn--ghost btn--sm" type="button" id="modal-cancel">Отмена</button>
+      <button class="btn btn--primary btn--sm" type="button" id="modal-go">Опубликовать</button>
+    </div>
+  </div>
+</div>
+
+<div class="admin-toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
