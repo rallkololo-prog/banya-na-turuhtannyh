@@ -232,7 +232,6 @@
 
       var head = el('div', 'admin-row__head');
       head.appendChild(field('Дни', 'tariffs.rows.' + i + '.label'));
-      head.appendChild(el('div', 'admin-row__day', row.label || ''));
       card.appendChild(head);
 
       var slots = el('div', 'admin-row__slots');
